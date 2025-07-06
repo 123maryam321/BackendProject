@@ -4,157 +4,128 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+
 app.use(express.json());
 
-// Root Route
+
 app.get('/', (req, res) => {
   res.send('🚀 Welcome to the Node.js API — deployed on Render! This is Maryam Azhar');
 });
 
-// Static User Info
-const apiPath = "/api/users";
-app.get(apiPath, (req, res) => {
-  res.json({
-    name: 'Maryam',
-    email: 'Maryam25azhar@gmail.com',
-    age: 26,
-    city: 'Karachi',
-    country: 'Pakistan'
-  });
-});
 
-// External API Route (Chori)
-const myApi = "/maryam-self-medication";
-const externalURL =
-"https://apidb.dvago.pk/AppAPIV3/GetProductBannersBySlugV1&Slug=AppHomePageProductCarouselOne&BranchCode=48&ProductID=&limit=0,10";
 
-app.get(myApi, async (req, res) => {
-  try {
-    const response = await axios.get(externalURL);
-    res.json({
-      message: "Data retrieved successfully",
-      myChori: response.data
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Failed to fetch Data",
-      error: error.message
-    });
-  }
-});
-
-// In-Memory User List
-const myJson = "/json-api";
 const data = [
-  { id: 1, name: 'Maryam', email: 'maryam@gmail.com' },
-  { id: 2, name: 'Amna', email: 'amna@gmail.com' },
-  { id: 3, name: 'Zara', email: 'zara@gmail.com' }
+  { id: 1, description: 'Sleep' },
+  { id: 2, description: 'Pray' },
+  { id: 3, description: 'Eat' }
 ];
 
-// GET All Users
-app.get(myJson, (req, res) => {
+// GET All Todo's
+const myGet = "/maryam-get-api";
+app.get(myGet, (req, res) => {
   res.json({
-    message: "Users retrieved successfully",
-    myUsers: data
+    message: "Todo's retrieved successfully",
+    myTodo: data
   });
 });
 
-// POST: Add New User
-app.post(myJson, (req, res) => {
-  try {
-    const { name, email } = req.body;
 
-    if (!name || !email) {
+// POST: Add New Todo
+const myPost = "/maryam-post-api";
+app.post(myPost, (req, res) => {
+  try {
+    const { description } = req.body;
+
+    if (!description) {
       return res.status(400).json({
-        message: "Name and email are required",
+        message: "Description required",
         error: "Missing required fields"
       });
     }
 
-    const newUser = {
+    const newTodo = {
       id: data.length + 1,
-      name,
-      email
+      description
     };
 
-    data.push(newUser);
+    data.push(newTodo);
 
     res.status(201).json({
-      message: "User added successfully",
-      newUser,
-      totalUsers: data.length
+      message: "TODO added successfully",
+      newTodo,
+      totalTodo: data.length
     });
 
   } catch (error) {
     res.status(500).json({
-      message: "Error adding user",
+      message: "Error adding TODO",
       error: error.message
     });
   }
 });
 
-// PUT: Replace Existing User
-app.put(`${myJson}/:id`, (req, res) => {
+// PUT: Replace Todo
+const myPut = "/maryam-put-api";
+app.put(`${myPut}/:id`, (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
-    const { name, email } = req.body;
+    const TodoID = parseInt(req.params.id);
+    const { description } = req.body;
 
-    const userIndex = data.findIndex(user => user.id === userId);
+    const todoIndex = data.findIndex(user => user.id === TodoID);
 
-    if (userIndex === -1) {
+    if (todoIndex === -1) {
       return res.status(404).json({
-        message: "User not found",
-        error: "User with this ID does not exist"
+        message: "TODO not found",
+        error: "TODO with this ID does not exist"
       });
     }
 
-    if (!name || !email) {
+    if (!description) {
       return res.status(400).json({
-        message: "PUT requires all fields (name and email)",
+        message: "PUT requires all fields (description)",
         error: "Missing required fields for complete resource replacement",
         note: "PUT replaces the entire resource, so all fields are required"
       });
     }
 
-    const updatedUser = {
-      id: userId,
-      name,
-      email
+    const updatedTodo = {
+      id: TodoID,
+      description
     };
 
-    data[userIndex] = updatedUser;
+    data[todoIndex] = updatedTodo;
 
     res.json({
-      message: "User completely replaced (PUT)",
-      updatedUser,
+      message: "TODO completely replaced (PUT)",
+      updatedTodo,
       note: "PUT replaced the entire resource with new data"
     });
 
   } catch (error) {
     res.status(500).json({
-      message: "Error updating user",
+      message: "Error updating TODO",
       error: error.message
     });
   }
 });
 
-// PATCH: Partially Update User
-app.patch(`${myJson}/:id`, (req, res) => {
+// PATCH: Partially Update Todo
+const myPatch = "/maryam-patch-api";
+app.patch(`${myPatch}/:id`, (req, res) => {
   try {
-    const userId = parseInt(req.params.id);
-    const { name, email } = req.body;
+    const TodoID = parseInt(req.params.id);
+    const { description } = req.body;
 
-    const userIndex = data.findIndex(user => user.id === userId);
+    const todoIndex = data.findIndex(user => user.id === TodoID);
 
-    if (userIndex === -1) {
+    if (todoIndex === -1) {
       return res.status(404).json({
-        message: "User not found",
-        error: "User with this ID does not exist"
+        message: "TODO not found",
+        error: "TODO with this ID does not exist"
       });
     }
 
-    if (!name && !email) {
+    if (!description) {
       return res.status(400).json({
         message: "PATCH requires at least one field to update",
         error: "No fields provided for update",
@@ -162,36 +133,32 @@ app.patch(`${myJson}/:id`, (req, res) => {
       });
     }
 
-    const currentUser = data[userIndex];
-    const updatedUser = {
-      ...currentUser,
-      ...(name && { name }),
-      ...(email && { email })
+    const currentTodo = data[todoIndex];
+    const updatedTodo = {
+      ...currentTodo,
+      ...(description && { description })
     };
 
-    data[userIndex] = updatedUser;
+    data[todoIndex] = updatedTodo;
 
     res.json({
-      message: "User partially updated (PATCH)",
-      updatedUser,
+      message: "TODO partially updated (PATCH)",
+      updatedTodo,
       changes: {
-        name: name ? `Changed from "${currentUser.name}" to "${name}"`
-: "No change",
-        email: email ? `Changed from "${currentUser.email}" to
-"${email}"` : "No change"
+        description: description ? `Changed from "${currentTodo.description}" to "${description}"` : "No change"
       },
       note: "PATCH updated only the provided fields, keeping other fields unchanged"
     });
 
   } catch (error) {
     res.status(500).json({
-      message: "Error updating user",
+      message: "Error updating TODO",
       error: error.message
     });
   }
 });
 
-// Server Listener
+
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
 });
