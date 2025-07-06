@@ -9,7 +9,7 @@ app.use(express.json());
 
 // Root Route
 app.get('/', (req, res) => {
-  res.send('🚀 Welcome to the Node.js API — deployed on Render! This is maryam Azhar');
+  res.send('🚀 Welcome to the Node.js API — deployed on Render! This is Maryam Azhar');
 });
 
 // Static User Info
@@ -25,20 +25,20 @@ app.get(apiPath, (req, res) => {
 });
 
 // External API Route (Chori)
-const myChoriApi = "/ali-self-medication";
+const myApi = "/maryam-self-medication";
 const externalURL =
 "https://apidb.dvago.pk/AppAPIV3/GetProductBannersBySlugV1&Slug=AppHomePageProductCarouselOne&BranchCode=48&ProductID=&limit=0,10";
 
-app.get(myChoriApi, async (req, res) => {
+app.get(myApi, async (req, res) => {
   try {
     const response = await axios.get(externalURL);
     res.json({
-      message: "Chori retrieved successfully",
+      message: "Data retrieved successfully",
       myChori: response.data
     });
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch Chori data",
+      message: "Failed to fetch Data",
       error: error.message
     });
   }
@@ -47,9 +47,9 @@ app.get(myChoriApi, async (req, res) => {
 // In-Memory User List
 const myJson = "/json-api";
 const data = [
-  { id: 1, name: 'Anas', email: 'anas@gmail.com' },
-  { id: 2, name: 'Ali', email: 'ali@gmail.com' },
-  { id: 3, name: 'Ahmed', email: 'ahmed@gmail.com' }
+  { id: 1, name: 'Maryam', email: 'maryam@gmail.com' },
+  { id: 2, name: 'Amna', email: 'amna@gmail.com' },
+  { id: 3, name: 'Zara', email: 'zara@gmail.com' }
 ];
 
 // GET All Users
